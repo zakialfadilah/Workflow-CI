@@ -13,14 +13,9 @@ from sklearn.metrics import accuracy_score, f1_score
 # ======================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DATA_PATH = os.path.join(
-    BASE_DIR,
-    "preprocessing",
-    "LoanDetection_preprocessing",
-    "LoanPrediction_preprocessing.csv"
-)
-
+DATA_PATH = "LoanPrediction_preprocessing.csv"
 df = pd.read_csv(DATA_PATH)
+
 
 X = df.drop(columns=["Loan_Status"])
 y = df["Loan_Status"]
