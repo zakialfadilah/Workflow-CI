@@ -10,7 +10,7 @@ mlflow.set_tracking_uri(
 )
 mlflow.set_experiment("Loan Prediction Experiment")
 
-df = pd.read_csv("preprocessing/LoanPrediction_preprocessing.csv")
+df = pd.read_csv("MLProject/LoanPrediction_preprocessing.csv")
 
 X = df.drop("Loan_Status", axis=1)
 y = df["Loan_Status"]
