@@ -32,10 +32,10 @@ jobs:
       run: |
         mlflow run MLProject --env-manager=local
 
-    - name: Build Docker Image from Registered Model
+    - name: Build Docker Image from Production Model
       run: |
         mlflow models build-docker \
-          --model-uri models:/loan-prediction-model/Production \
+          --model-uri models:/LoanPredictionModel@production \
           --name zakialfadilah/loan-prediction-mlflow
 
     - name: Login Docker Hub
