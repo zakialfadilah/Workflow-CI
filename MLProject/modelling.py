@@ -8,11 +8,6 @@ from sklearn.metrics import accuracy_score
 from mlflow.models.signature import infer_signature
 
 # =====================
-# SET EXPERIMENT (AMAN)
-# =====================
-mlflow.set_experiment("Loan Prediction CI Experiment")
-
-# =====================
 # LOAD DATA
 # =====================
 DATA_PATH = "preprocessing/LoanPrediction_preprocessing.csv"
@@ -41,12 +36,12 @@ mlflow.log_param("model_type", "LogisticRegression")
 mlflow.log_metric("accuracy", acc)
 
 # =====================
-# LOG MODEL (SIGNATURE WAJIB)
+# LOG MODEL
 # =====================
 signature = infer_signature(X_train, model.predict(X_train))
 
 mlflow.sklearn.log_model(
-    sk_model=model,
+    model,
     artifact_path="model",
     signature=signature,
     registered_model_name="LoanPredictionModel"
