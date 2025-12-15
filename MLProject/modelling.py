@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from mlflow.models.signature import infer_signature
 
 # =====================
-# SET EXPERIMENT (WAJIB)
+# SET EXPERIMENT (AMAN)
 # =====================
 mlflow.set_experiment("Loan Prediction CI Experiment")
 
@@ -26,32 +26,30 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # =====================
-# START RUN (WAJIB)
+# TRAIN MODEL
 # =====================
-with mlflow.start_run(run_name="CI_Training_Run"):
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
 
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
 
-    y_pred = model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
+# =====================
+# LOG PARAM & METRIC
+# =====================
+mlflow.log_param("model_type", "LogisticRegression")
+mlflow.log_metric("accuracy", acc)
 
-    # =====================
-    # LOG PARAM & METRIC
-    # =====================
-    mlflow.log_param("model_type", "LogisticRegression")
-    mlflow.log_metric("accuracy", acc)
+# =====================
+# LOG MODEL (SIGNATURE WAJIB)
+# =====================
+signature = infer_signature(X_train, model.predict(X_train))
 
-    # =====================
-    # LOG MODEL + SIGNATURE
-    # =====================
-    signature = infer_signature(X_train, model.predict(X_train))
+mlflow.sklearn.log_model(
+    sk_model=model,
+    artifact_path="model",
+    signature=signature,
+    registered_model_name="LoanPredictionModel"
+)
 
-    mlflow.sklearn.log_model(
-        sk_model=model,
-        artifact_path="model",
-        signature=signature,
-        registered_model_name="LoanPredictionModel"
-    )
-
-    print("Training finished. Accuracy:", acc)
+print("Training finished. Accuracy:", acc)
