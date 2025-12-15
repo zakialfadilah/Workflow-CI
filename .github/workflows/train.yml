@@ -35,8 +35,9 @@ jobs:
     - name: Build Docker Image from Production Model
       run: |
         mlflow models build-docker \
-          --model-uri models:/LoanPredictionModel/production \
+          --model-uri models:/LoanPredictionModel@production \
           --name zakialfadilah/loan-prediction-mlflow
+
 
     - name: Login Docker Hub
       run: |
