@@ -10,46 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-    - name: Install dependencies
-      run: |
-        pip install mlflow==2.19.0 dagshub scikit-learn pandas
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mlflow==2.19.0 dagshub scikit-learn pandas matplotlib seaborn
 
-    - name: Set MLflow DagsHub Env
-      run: |
-        echo "MLFLOW_TRACKING_URI=https://dagshub.com/zakialfadilah/loan-prediction-mlflow.mlflow" >> $GITHUB_ENV
-        echo "MLFLOW_TRACKING_USERNAME=${{ secrets.DAGSHUB_USER }}" >> $GITHUB_ENV
-        echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.DAGSHUB_TOKEN }}" >> $GITHUB_ENV
+      - name: Set MLflow (DagsHub) Environment
+        env:
+          DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          echo "MLFLOW_TRACKING_URI=https://dagshub.com/zakialfadilah/loan-prediction-mlflow.mlflow" >> $GITHUB_ENV
+          echo "MLFLOW_TRACKING_USERNAME=$DAGSHUB_USER" >> $GITHUB_ENV
+          echo "MLFLOW_TRACKING_PASSWORD=$DAGSHUB_TOKEN" >> $GITHUB_ENV
 
-    # - name: Run MLflow Project
-    #  run: |
-    #    mlflow run MLProject --env-manager=local
-    
-    - name: Run MLflow Project
-      run: |
-        mlflow run MLProject \
-          --experiment-name "Loan Prediction CI Experiment" \
-          --env-manager=local
-
-    - name: Build Docker Image from Production Model
-      run: |
-        mlflow models build-docker \
-          --model-uri models:/LoanPredictionModel@production \
-          --name zakialfadilah/loan-prediction-mlflow
-
-
-    - name: Login Docker Hub
-      run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login \
-          -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-    - name: Push Docker Image
-      run: |
-        docker push zakialfadilah/loan-prediction-mlflow
+      - name: Run modelling script (with autolog)
+        env:
+          DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          python Membangun_model/modelling.py
