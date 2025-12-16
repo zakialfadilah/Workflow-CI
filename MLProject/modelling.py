@@ -8,56 +8,51 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score
 
 # ======================
-# Load Data
+# PATH SETUP (CI SAFE)
 # ======================
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATA_PATH = os.path.join(
     BASE_DIR,
     "preprocessing",
-    "LoanDetection_preprocessing",
     "LoanPrediction_preprocessing.csv"
 )
 
+# ======================
+# LOAD DATA
+# ======================
 df = pd.read_csv(DATA_PATH)
 
 X = df.drop(columns=["Loan_Status"])
 y = df["Loan_Status"]
 
 # ======================
-# Train-Test Split
+# TRAIN TEST SPLIT
 # ======================
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
 # ======================
-# MLflow Experiment
+# MLFLOW SETUP
 # ======================
 mlflow.set_experiment("Loan Prediction Experiment")
 
-# Autolog 
+# AUTOLOG (INI YANG DIMINTA REVIEWER)
 mlflow.autolog()
 
 with mlflow.start_run():
 
-    # Parameter
-    C = 1.0
-    max_iter = 200
-
-    model = LogisticRegression(C=C, max_iter=max_iter)
+    # MODEL
+    model = LogisticRegression(max_iter=200)
     model.fit(X_train, y_train)
 
-    # Prediction
+    # PREDICTION
     y_pred = model.predict(X_test)
 
-    # Metrics
+    # METRICS
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
-
-    # (Additional) Manual logging 
-    mlflow.log_metric("accuracy_manual", acc)
-    mlflow.log_metric("f1_score_manual", f1)
 
     print("Accuracy:", acc)
     print("F1 Score:", f1)
